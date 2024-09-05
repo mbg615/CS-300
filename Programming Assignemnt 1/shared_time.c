@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 
@@ -10,6 +9,11 @@
 #include <sys/fcntl.h>
 
 int main(int argc, char *argv[]) {
+    if(argc < 2) {
+        perror("Error, too few arguments");
+        return -1;
+    }
+
     /* define constants for shared memory */
     const char *memoryName = "timeMemory";
     const int memorySize = 4096;
