@@ -13,21 +13,23 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    pthread_t tid_1; // thread 1 identifier
-    pthread_t tid_2; // thread 2 identifier
+    const int numOfThreads = 2;
+
+    /* create thread identifiers */
+    pthread_t tids[numOfThreads];
 
     /* set default thread attributes */
-    pthread_attr_t attr_1;
-    pthread_attr_t attr_2;
-    pthread_attr_init(&attr_1);
-    pthread_attr_init(&attr_2);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
 
+    /* create threads */
+    pthread_create(&tids[0], &attr, runner, argv[1]);
+    pthread_create(&tids[1], &attr, runner, argv[1]);
 
-    /* create and join threads */
-    pthread_create(&tid_1, &attr_1, runner, argv[1]);
-    pthread_create(&tid_2, &attr_2, runner, argv[1]);
-    pthread_join(tid_1, NULL);
-    pthread_join(tid_2, NULL);
+    /* join threads */
+    for(int i = 0; i < numOfThreads; i++) {
+        pthread_join(tids[i], NULL);
+    }
 
     /* estimate and print the value for pi */
     printf("%lf", (4 * pointsInCircle / strtod(argv[1], NULL)));
