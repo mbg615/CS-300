@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* estimate and print the value for pi */
-    printf("%lf", (4 * pointsInCircle / strtod(argv[1], NULL)));
+    printf("π ≈ %lf\n", (4 * pointsInCircle / strtod(argv[1], NULL)));
 
     return 0;
 }
