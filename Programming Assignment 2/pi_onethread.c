@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    srand(time(NULL));
+
     pthread_t tid; // thread identifier
 
     /* set default thread attributes */
