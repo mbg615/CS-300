@@ -15,11 +15,14 @@ volatile int tas_lock = 0; // 0: unlocked, 1: locked
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t semaphore;
 
+
 // 1. Mutex worker, finish the code to use pthread mutex to synchronize threads
 void* mutexWorker(void* arg) {
     long maxcount = *(long*)arg;
     for (long i = 0; i < maxcount; i++) {
+        pthread_mutex_lock(&mutex);
         counter_mutex++;
+        pthread_mutex_unlock(&mutex);
     }
     return NULL;
 }
@@ -28,7 +31,9 @@ void* mutexWorker(void* arg) {
 void* semaphoreWorker(void* arg) {
     long maxcount = *(long*)arg;
     for (long i = 0; i < maxcount; i++) {
+        sem_wait(&semaphore);
         counter_semaphore++;
+        sem_post(&semaphore);
     }
     return NULL;
 }
@@ -140,6 +145,7 @@ int main(int argc, char *argv[]) {
 
     // Semaphore increment   
     // Initialize the semaphore here
+    sem_init(&semaphore, 0, 1);
 
     // Create threads
     for (int i = 0; i < num_threads; i++) {
