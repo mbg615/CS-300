@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <semaphore.h>
+#include <threads.h>
 
 volatile long long counter_mutex = 0; // Counter for Mutex Worker
 volatile long long counter_semaphore = 0; // Counter for Binary Semaphore Worker
@@ -15,6 +16,8 @@ volatile int tas_lock = 0; // 0: unlocked, 1: locked
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t semaphore;
 
+struct timeval startTime;
+struct timeval endTime;
 
 // 1. Mutex worker, finish the code to use pthread mutex to synchronize threads
 void* mutexWorker(void* arg) {
@@ -83,6 +86,11 @@ void *DumWorker(void *arg) {
     return NULL;
 }
 
+void *getElapsed(double *elapsed, struct timeval *startTime, struct timeval *endTime) {
+    *elapsed = (double)(endTime->tv_sec - startTime->tv_sec) + ((double)(endTime->tv_usec - startTime->tv_usec) / 1000000);
+
+}
+
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -92,10 +100,11 @@ int main(int argc, char *argv[]) {
     int num_threads = atoi(argv[1]);
     long maxcount = atol(argv[2]);
 
-    long long elapsed;
+    double elapsed;
     pthread_t threads[num_threads];
 
-    // Dum increment   
+    // Dum increment
+    gettimeofday(&startTime, NULL);
 
     // Create threads
     for (int i = 0; i < num_threads; i++) {
@@ -106,11 +115,14 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], NULL);
     }
 
+    gettimeofday(&endTime, NULL);
+    getElapsed(&elapsed, &startTime, &endTime);
     // measure the execution time and print final counter value
-    printf("Dum Time [%lld], final counter value: %lld \n", elapsed, counter_dum);
+    printf("Dum Time [%lf], final counter value: %lld \n", elapsed, counter_dum);
 
 
     // CAS increment
+    gettimeofday(&startTime, NULL);
 
     // Create threads
     for (int i = 0; i < num_threads; i++) {
@@ -121,9 +133,12 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("CAS Time [%lld], final counter value: %lld \n", elapsed, counter_cas);
+    gettimeofday(&endTime, NULL);
+    getElapsed(&elapsed, &startTime, &endTime);
+    printf("CAS Time [%lf], final counter value: %lld \n", elapsed, counter_cas);
 
-    // TAS increment   
+    // TAS increment
+    gettimeofday(&startTime, NULL);
 
     // Create threads
     for (int i = 0; i < num_threads; i++) {
@@ -134,10 +149,12 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("TAS Time [%lld], final counter value: %lld \n", elapsed, counter_tas);
+    gettimeofday(&endTime, NULL);
+    getElapsed(&elapsed, &startTime, &endTime);
+    printf("TAS Time [%lf], final counter value: %lld \n", elapsed, counter_tas);
 
-
-    // Mutex increment   
+    // Mutex increment
+    gettimeofday(&startTime, NULL);
 
     // Create threads
     for (int i = 0; i < num_threads; i++) {
@@ -148,9 +165,12 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("MUT Time [%lld], final counter value: %lld \n", elapsed, counter_mutex);
+    gettimeofday(&endTime, NULL);
+    getElapsed(&elapsed, &startTime, &endTime);
+    printf("MUT Time [%lf], final counter value: %lld \n", elapsed, counter_mutex);
 
-    // Semaphore increment   
+    // Semaphore increment
+    gettimeofday(&startTime, NULL);
     // Initialize the semaphore here
     sem_init(&semaphore, 0, 1);
 
@@ -163,7 +183,9 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("SEM Time [%lld], final counter value: %lld \n", elapsed, counter_semaphore);
+    gettimeofday(&endTime, NULL);
+    getElapsed(&elapsed, &startTime, &endTime);
+    printf("SEM Time [%lf], final counter value: %lld \n", elapsed, counter_semaphore);
 
     // Destroy mutex and semaphore
     pthread_mutex_destroy(&mutex);
