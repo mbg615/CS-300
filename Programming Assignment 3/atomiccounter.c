@@ -40,7 +40,10 @@ void* semaphoreWorker(void* arg) {
 
 // 3. CAS worker, finish the code to use CAS for atomic_increment
 void atomic_increment(long long* value) {
-    // finish the code for CAS-based atomic increment
+    long long oldVal;
+    do {
+        oldVal = __atomic_load_n(value, __ATOMIC_RELAXED);
+    } while(!__atomic_compare_exchange_n(value, &oldVal, oldVal + 1, 0, __ATOMIC_RELAXED, __ATOMIC_RELAXED));
 }
 
 void* CASWorker(void* arg) {
