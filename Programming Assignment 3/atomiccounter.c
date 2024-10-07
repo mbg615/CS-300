@@ -55,17 +55,21 @@ void* CASWorker(void* arg) {
 }
 
 void tas_lock_acquire(volatile int* lock) {
-    // finish the code for TAS lock 
+    while(__sync_lock_test_and_set(lock,1)) {
+
+    }
 }
 
 void tas_lock_release(volatile int* lock) {
-    // finish the code for TAS lock 
+    __sync_lock_release(lock);
 }
 // 4. Test-and-Set Worker, finish the code with TAS lock 
 void* testAndSetWorker(void* arg) {
     long maxcount = *(long*)arg;
     for (long i = 0; i < maxcount; i++) {
+        tas_lock_acquire(&tas_lock);
         counter_tas++;
+        tas_lock_release(&tas_lock);
     }
     return NULL;
 }
