@@ -3,7 +3,6 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <semaphore.h>
-#include <threads.h>
 
 volatile long long counter_mutex = 0; // Counter for Mutex Worker
 volatile long long counter_semaphore = 0; // Counter for Binary Semaphore Worker
@@ -86,7 +85,7 @@ void *DumWorker(void *arg) {
     return NULL;
 }
 
-void *getElapsed(double *elapsed, struct timeval *startTime, struct timeval *endTime) {
+void getElapsed(double *elapsed, struct timeval *startTime, struct timeval *endTime) {
     *elapsed = (double)(endTime->tv_sec - startTime->tv_sec) + ((double)(endTime->tv_usec - startTime->tv_usec) / 1000000);
 
 }
